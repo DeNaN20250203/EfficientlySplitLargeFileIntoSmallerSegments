@@ -4,64 +4,63 @@
     {
         static void Main(string[] args)
         {
-			string inputFile = @"C:\Work\Загрузки\example.txt";
-			string outputTemplate = @"C:\Work\Загрузки\output_{0}.txt";
-			//long maxChunkSize = 10L * 1024 * 1024 * 1024; // 10 ГБ
-			long maxChunkSize = 100; // Размер чанка в байтах
+		string inputFile = @"C:\Work\Загрузки\example.txt";
+		string outputTemplate = @"C:\Work\Загрузки\output_{0}.txt";
+		//long maxChunkSize = 10L * 1024 * 1024 * 1024; // 10 ГБ
+		long maxChunkSize = 100; // Размер чанка в байтах Пример для теста программы
 
-			SplitFile(inputFile, outputTemplate, maxChunkSize);
-			Console.WriteLine("Готово! :)");
-			Console.ReadKey();
-		}
+		SplitFile(inputFile, outputTemplate, maxChunkSize);
+		Console.WriteLine("Готово! :)");
+		Console.ReadKey();
+	}
 
-		/// <summary>
-		/// <para>Method…</para>
-		/// <para>Разделяет большой файл на несколько меньших файлов, 
-		/// основываясь на максимальном размере чанка.</para>
-		/// </summary>
-		/// <param name="inputPath">Путь к исходному файлу, который нужно разделить.</param>
-		/// <param name="outputPathTemplate">Шаблон для именования выходных файлов. 
-		/// Используйте {0} для номера части.</param>
-		/// <param name="maxChunkSize">Максимальный размер чанка в байтах.</param>
-		static void SplitFile(string inputPath, string outputPathTemplate, long maxChunkSize)
+	/// <summary>
+	/// <para>Method…</para>
+	/// <para>Разделяет большой файл на несколько меньших файлов, 
+	/// основываясь на максимальном размере чанка.</para>
+	/// </summary>
+	/// <param name="inputPath">Путь к исходному файлу, который нужно разделить.</param>
+	/// <param name="outputPathTemplate">Шаблон для именования выходных файлов. 
+	/// Используйте {0} для номера части.</param>
+	/// <param name="maxChunkSize">Максимальный размер чанка в байтах.</param>
+	static void SplitFile(string inputPath, string outputPathTemplate, long maxChunkSize)
+	{
+		const int bufferSize = 4096 * 1024; // 4 МБ буфер для чтения
+		byte[] buffer = new byte[bufferSize];
+		List<byte> lineBuffer = new List<byte>();
+		int partNumber = 1;
+		long currentChunkSize = 0;
+		FileStream? currentOutputStream = null;
+
+		try
 		{
-			const int bufferSize = 4096 * 1024; // 4 МБ буфер для чтения
-			byte[] buffer = new byte[bufferSize];
-			List<byte> lineBuffer = new List<byte>();
-			int partNumber = 1;
-			long currentChunkSize = 0;
-			FileStream? currentOutputStream = null;
-
-			try
+			using (var inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize))
 			{
-				using (var inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize))
+				while (true)
 				{
-					while (true)
+					int bytesRead = inputStream.Read(buffer, 0, buffer.Length);
+					if (bytesRead == 0) break;
+					for (int i = 0; i < bytesRead; i++)
 					{
-						int bytesRead = inputStream.Read(buffer, 0, buffer.Length);
-						if (bytesRead == 0) break;
+						byte b = buffer[i];
+						lineBuffer.Add(b);
 
-						for (int i = 0; i < bytesRead; i++)
+						// Определение конца строки (поддерживает \n и \r\n)
+						if (b == '\n')
 						{
-							byte b = buffer[i];
-							lineBuffer.Add(b);
-
-							// Определение конца строки (поддерживает \n и \r\n)
-							if (b == '\n')
-							{
-								ProcessLine(ref lineBuffer, ref currentOutputStream!,
-										  ref partNumber, ref currentChunkSize,
-										  maxChunkSize, outputPathTemplate);
-							}
-						}
-					}
-
-					// Обработка последней строки без \n
-					if (lineBuffer.Count > 0)
-					{
-						ProcessLine(ref lineBuffer, ref currentOutputStream!,
+							ProcessLine(ref lineBuffer, ref currentOutputStream!,
 								  ref partNumber, ref currentChunkSize,
 								  maxChunkSize, outputPathTemplate);
+						}
+					}
+				}
+
+				// Обработка последней строки без \n
+				if (lineBuffer.Count > 0)
+				{
+					ProcessLine(ref lineBuffer, ref currentOutputStream!,
+							  ref partNumber, ref currentChunkSize,
+							  maxChunkSize, outputPathTemplate);
 					}
 				}
 			}
