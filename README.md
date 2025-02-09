@@ -1,7 +1,6 @@
+<a id="anchor"></a>
 # How to efficiently split a large file into smaller segments, 
 ## или Как эффективно разделить большой файл на меньшие сегменты…
-
-<a id="anchor"></a>
 
 ---
 Инструменты для разделения больших файлов на небольшие фрагменты
