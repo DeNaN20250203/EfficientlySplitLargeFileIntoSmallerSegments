@@ -20,5 +20,5 @@
 	  Отсутствие преобразования в строки (string) **уменьшает нагрузку на GC**.</br>
 	  **Линейная сложность алгоритма O(n)** гарантирует обработку файла за разумное время.</br>
 	  Это решение обеспечивает надежное разделение огромных файлов с минимальным потреблением памяти и сохранением целостности данных.</br>
-<a href="https://github.com/DeNaN20250203" target="_blank"><img src="GitHubDeJra.png" alt="Image" width = "600"></a>
+<a href="https://github.com/DeNaN20250203" target="_blank"><img src="GitHubDeJra.png" alt="Image" width = "600" /></a>
 [Верх](#anchor)
